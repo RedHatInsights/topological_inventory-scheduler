@@ -6,7 +6,7 @@ module TopologicalInventory
     class Worker
       include Logging
 
-      JOB_REFRESH_QUEUE_NAME = "platform.topological-inventory.collector-ansible-tower".freeze
+      REFRESH_QUEUE_NAME = "platform.topological-inventory.collector-ansible-tower".freeze
 
       def initialize(opts = {})
         messaging_client_opts = opts.select { |k, _| %i[host port].include?(k) }
@@ -27,25 +27,27 @@ module TopologicalInventory
 
       private
 
+      # TODO: optimize
       def invoke_targeted_refresh(tasks)
         payload = []
 
         tasks.each do |task|
           logger.info("Publishing ServiceInstance:SourceRef: #{task.target_source_ref}, Task: #{task.id}")
-          payload <<
+          payload =
             {
               :request_context => task.forwardable_headers,
-              :source_id       => task.source_id.to_s,
-              :source_uid      => task.source_uid.to_s,
-              :source_ref      => task.target_source_ref
+              :params          => {
+                :source_id             => task.source_id.to_s,
+                :source_uid            => task.source_uid.to_s,
+                :service_instance_refs => [task.target_source_ref]
+              }
             }
+          messaging_client.publish_topic(
+            :service => REFRESH_QUEUE_NAME,
+            :event   => "ServiceInstance.refresh",
+            :payload => payload.to_json
+          )
         end
-
-        messaging_client.publish_topic(
-          :service => JOB_REFRESH_QUEUE_NAME,
-          :event   => "ServiceInstance.refresh",
-          :payload => payload.to_json
-        )
       end
 
       def load_running_tasks
