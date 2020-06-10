@@ -7,7 +7,7 @@
 /.yardoc
 /Gemfile.lock
 /_yardoc/
-#/bundler.d/
+/bundler.d/
 /config/database.yml
 /coverage/
 /doc/
