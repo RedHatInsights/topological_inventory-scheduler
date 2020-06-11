@@ -1,6 +1,7 @@
 require 'concurrent'
-require 'topological_inventory/scheduler/logging'
 require 'manageiq-messaging'
+require 'topological_inventory/scheduler/logging'
+require 'topological_inventory/scheduler/sources_api_client'
 
 module TopologicalInventory
   module Scheduler
@@ -14,11 +15,16 @@ module TopologicalInventory
         self.finished = Concurrent::AtomicBoolean.new(false)
         messaging_client_opts = opts.select { |k, _| %i[host port].include?(k) }
         self.messaging_client_opts = default_messaging_opts.merge(messaging_client_opts)
+        self.api = SourcesApiClient.new
       end
 
       # TODO: schedule also full refreshes
       def run
         logger.info('Topological Inventory Refresh Scheduler started...')
+
+        # TODO: restrict targeted refreshes to AnsibleTower Source
+        # api.load_source_types
+
         until finished? do
           tasks = load_running_tasks
 
@@ -39,7 +45,7 @@ module TopologicalInventory
 
       private
 
-      attr_accessor :finished, :messaging_client_opts
+      attr_accessor :api, :finished, :messaging_client_opts
 
       def service_instance_refresh(tasks)
         logger.info('ServiceInstance#refresh - Started')
@@ -63,7 +69,7 @@ module TopologicalInventory
             payload[:params] << {
               :request_context => task.forwardable_headers,
               :source_ref      => task.target_source_ref,
-              :task_id         => task.id
+              :task_id         => task.id.to_s
             }
           end
         end

@@ -15,3 +15,6 @@
 /pkg/
 /spec/reports/
 /tmp/
+
+# generated rubocop file
+.rubocop-https*
