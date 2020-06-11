@@ -14,6 +14,10 @@ opts = {
 TopologicalInventory::Core::ArHelper.database_yaml_path = Pathname.new(__dir__).join("../config/database.yml")
 TopologicalInventory::Core::ArHelper.load_environment!
 
+begin
+  scheduler_worker = TopologicalInventory::Scheduler::Worker.new(opts)
+  scheduler_worker.run
+ensure
+  scheduler_worker&.stop
+end
 
-scheduler_worker = TopologicalInventory::Scheduler::Worker.new(opts)
-scheduler_worker.run
