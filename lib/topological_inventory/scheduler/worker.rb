@@ -1,7 +1,5 @@
-require 'concurrent'
 require 'manageiq-messaging'
 require 'topological_inventory/scheduler/logging'
-require 'topological_inventory/scheduler/sources_api_client'
 
 module TopologicalInventory
   module Scheduler
@@ -9,43 +7,24 @@ module TopologicalInventory
       include Logging
 
       REFRESH_QUEUE_NAME = 'platform.topological-inventory.collector-ansible-tower'.freeze
-      POLL_TIME = 30.seconds.freeze
 
       def initialize(opts = {})
-        self.finished = Concurrent::AtomicBoolean.new(false)
         messaging_client_opts = opts.select { |k, _| %i[host port].include?(k) }
         self.messaging_client_opts = default_messaging_opts.merge(messaging_client_opts)
-        self.api = SourcesApiClient.new
       end
 
-      # TODO: schedule also full refreshes
       def run
         logger.info('Topological Inventory Refresh Scheduler started...')
 
-        # TODO: restrict targeted refreshes to AnsibleTower Source
-        # api.load_source_types
+        tasks = load_running_tasks
+        service_instance_refresh(tasks)
 
-        until finished? do
-          tasks = load_running_tasks
-
-          service_instance_refresh(tasks)
-
-          sleep(POLL_TIME)
-        end
         logger.info('Topological Inventory Refresh Scheduler finished...')
-      end
-
-      def stop
-        finished.value = true
-      end
-
-      def finished?
-        finished.value
       end
 
       private
 
-      attr_accessor :api, :finished, :messaging_client_opts
+      attr_accessor :messaging_client_opts
 
       def service_instance_refresh(tasks)
         logger.info('ServiceInstance#refresh - Started')
@@ -80,11 +59,13 @@ module TopologicalInventory
         logger.error("ServiceInstance#refresh - Failed. Task(id: #{tasks_id(tasks).join(' | ')}). Error: #{e.message}, #{e.backtrace.join('\n')}")
       end
 
+      # TODO: restrict targeted refreshes to AnsibleTower Source
+      # Not needed now as we don't have service_instance tasks not belonging to Tower
       def load_running_tasks
         Task.where(:state => 'running', :target_type => 'ServiceInstance')
-          .joins(:source)
-          .select('tasks.id, tasks.source_id, tasks.target_source_ref, tasks.forwardable_headers, sources.uid as source_uid')
-          .order('source_id')
+            .joins(:source)
+            .select('tasks.id, tasks.source_id, tasks.target_source_ref, tasks.forwardable_headers, sources.uid as source_uid')
+            .order('source_id')
       end
 
       def tasks_id(tasks = load_running_tasks)
