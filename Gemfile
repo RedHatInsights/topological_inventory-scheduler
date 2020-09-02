@@ -11,7 +11,7 @@ gem 'prometheus_exporter', '~> 0.4.5'
 
 gem 'topological_inventory-core', '~> 1.1.5'
 
-group :development do
+group :development, :test do
   gem 'rspec-rails',         '~>3.8'
   gem 'rubocop',             '~>0.69.0', :require => false
   gem 'rubocop-performance', '~>1.3',    :require => false
