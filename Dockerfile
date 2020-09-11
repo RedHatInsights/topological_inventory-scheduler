@@ -29,6 +29,7 @@ RUN echo "gem: --no-document" > ~/.gemrc && \
 COPY . $WORKDIR
 COPY docker-assets/entrypoint /usr/bin
 COPY docker-assets/run_scheduler /usr/bin
+COPY docker-assets/run_db_cleaner /usr/bin
 
 RUN chgrp -R 0 $WORKDIR && \
     chmod -R g=u $WORKDIR
