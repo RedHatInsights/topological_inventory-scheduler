@@ -12,7 +12,7 @@ RUN dnf -y --disableplugin=subscription-manager module enable ruby:2.5 && \
       # To compile pg gem
       postgresql-devel libxml2-devel \
       && \
-    dnf --disableplugin=subscription-manager clean all
+      dnf --disableplugin=subscription-manager clean all
 
 ENV WORKDIR /opt/topological-inventory-scheduler/
 ENV RAILS_ROOT $WORKDIR
@@ -27,14 +27,8 @@ RUN echo "gem: --no-document" > ~/.gemrc && \
     rm -rvf /root/.bundle/cache
 
 COPY . $WORKDIR
-COPY docker-assets/entrypoint /usr/bin
-COPY docker-assets/run_scheduler /usr/bin
-COPY docker-assets/run_db_cleaner /usr/bin
 
 RUN chgrp -R 0 $WORKDIR && \
     chmod -R g=u $WORKDIR
 
 EXPOSE 9394
-
-ENTRYPOINT ["entrypoint"]
-CMD ["run_scheduler"]

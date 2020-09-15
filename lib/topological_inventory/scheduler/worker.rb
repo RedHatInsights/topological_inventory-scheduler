@@ -1,5 +1,4 @@
 require 'manageiq-messaging'
-require 'topological_inventory/scheduler/logging'
 
 module TopologicalInventory
   module Scheduler

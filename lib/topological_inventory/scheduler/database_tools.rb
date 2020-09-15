@@ -1,4 +1,3 @@
-require 'topological_inventory/scheduler/logging'
 require 'active_support/core_ext/integer/time'
 
 module TopologicalInventory
