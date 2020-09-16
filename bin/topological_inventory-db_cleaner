@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH << File.expand_path("../lib", __dir__)
+require 'bundler/setup'
+require 'topological_inventory/core/ar_helper'
+
+TopologicalInventory::Core::ArHelper.database_yaml_path = Pathname.new(__dir__).join("../config/database.yml")
+TopologicalInventory::Core::ArHelper.load_environment!
+
+require 'topological_inventory/scheduler/database_tools'
+
+TopologicalInventory::Scheduler::DatabaseTools.new.remove_old_records
