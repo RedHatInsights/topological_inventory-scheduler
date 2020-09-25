@@ -9,6 +9,7 @@ gem 'manageiq-messaging',  '~> 0.1.2'
 gem 'optimist',            '~> 3.0'
 gem 'prometheus_exporter', '~> 0.4.5'
 
+gem 'sources-api-client', '~> 3.0'
 gem 'topological_inventory-core', '~> 1.1.7'
 
 group :development, :test do
