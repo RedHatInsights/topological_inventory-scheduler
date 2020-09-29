@@ -1,10 +1,7 @@
-require 'topological_inventory/core/ar_helper'
-TopologicalInventory::Core::ArHelper.load_environment!
-
 require "topological_inventory/scheduler/database_tools"
 
 RSpec.describe TopologicalInventory::Scheduler::DatabaseTools do
-  subject { described_class }
+  subject { described_class.new }
 
   describe "#remove_old_records" do
     let(:uuids) { ['f41743e5-639b-411f-89a7-ed1a4cb9d860', 'c2cb467d-156f-41bb-bdab-a7d311b54f1b'] }
