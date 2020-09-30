@@ -8,16 +8,23 @@ raise "Specs must be run in test environment" if ENV["RAILS_ENV"] != "test"
 
 require 'active_record/railtie'
 require 'action_controller/railtie'
+require 'factory_bot'
 require 'rspec/rails'
-
 require 'topological_inventory/core/ar_helper'
+require 'topological_inventory/scheduler/logging'
+
 TopologicalInventory::Core::ArHelper.database_yaml_path = Pathname.new(__dir__).join("../config/database.yml")
 TopologicalInventory::Core::ArHelper.load_environment!
 
-require "topological_inventory/scheduler/logging"
-TopologicalInventory::Scheduler.logger = Logger.new('/dev/null')
+# TopologicalInventory::Scheduler.logger = Logger.new('/dev/null')
 
 RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
+
+  config.before(:suite) do
+    FactoryBot.find_definitions
+  end
+
   config.use_transactional_fixtures = true
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

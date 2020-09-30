@@ -31,7 +31,7 @@ module TopologicalInventory
         logger.info('ServiceInstance#refresh - Started')
         payload, skipped = {}, {}
 
-        tasks.find_each do |task|
+        with_tasks(tasks) do |task|
           # grouping requests by Source
           # - tasks are ordered by source_id
           if payload[:source_id].present? && payload[:source_id] != task.source_id.to_s
@@ -75,6 +75,25 @@ module TopologicalInventory
             .joins(:source)
             .select('tasks.id, tasks.source_id, tasks.target_source_ref, tasks.forwardable_headers, sources.uid as source_uid')
             .order('source_id')
+      end
+
+      # find_each is ignoring ordering, has to be self-implemented
+      # https://api.rubyonrails.org/classes/ActiveRecord/Batches.html
+      def with_tasks(tasks)
+        limit, offset = 1000, 0
+        loop do
+          tasks_cnt = 0
+          tasks.limit(limit).offset(offset).each do |task|
+            tasks_cnt += 1
+            yield task
+          end
+
+          if tasks_cnt == limit
+            offset += limit
+          else
+            break
+          end
+        end
       end
 
       def tasks_id(tasks = load_running_tasks)

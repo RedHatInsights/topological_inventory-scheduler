@@ -13,6 +13,7 @@ gem 'sources-api-client', '~> 3.0'
 gem 'topological_inventory-core', '~> 1.1.7'
 
 group :development, :test do
+  gem 'factory_bot',         '~>6.1'
   gem 'rspec-rails',         '~>3.8'
   gem 'rubocop',             '~>0.69.0', :require => false
   gem 'rubocop-performance', '~>1.3',    :require => false
