@@ -80,7 +80,7 @@ module TopologicalInventory
       # find_each is ignoring ordering, has to be self-implemented
       # https://api.rubyonrails.org/classes/ActiveRecord/Batches.html
       def with_tasks(tasks)
-        limit, offset = 1000, 0
+        limit, offset = 100, 0
         loop do
           tasks_cnt = 0
           tasks.limit(limit).offset(offset).each do |task|
