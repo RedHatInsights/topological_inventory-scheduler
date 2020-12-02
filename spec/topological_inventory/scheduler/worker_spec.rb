@@ -75,6 +75,7 @@ RSpec.describe TopologicalInventory::Scheduler::Worker do
         payload = {
           :source_id  => @sources[0].id.to_s,
           :source_uid => @sources[0].uid.to_s,
+          :sent_at    => Time.now.utc.iso8601,
           :params     => [
             :request_context => @tasks[0].forwardable_headers,
             :source_ref      => @service_instances[0].source_ref,
@@ -103,6 +104,7 @@ RSpec.describe TopologicalInventory::Scheduler::Worker do
         payload = {
           :source_id  => @sources[0].id.to_s,
           :source_uid => @sources[0].uid.to_s,
+          :sent_at    => Time.now.utc.iso8601,
           :params     => [{:request_context => @tasks[0].forwardable_headers,
                            :source_ref      => @service_instances[0].source_ref,
                            :task_id         => @tasks[0].id.to_s},
@@ -115,6 +117,7 @@ RSpec.describe TopologicalInventory::Scheduler::Worker do
         payload = {
           :source_id  => @sources[1].id.to_s,
           :source_uid => @sources[1].uid.to_s,
+          :sent_at    => Time.now.utc.iso8601,
           :params     => [{:request_context => @tasks[1].forwardable_headers,
                            :source_ref      => @service_instances[1].source_ref,
                            :task_id         => @tasks[1].id.to_s}]

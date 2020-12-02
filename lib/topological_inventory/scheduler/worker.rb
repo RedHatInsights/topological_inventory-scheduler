@@ -51,6 +51,7 @@ module TopologicalInventory
 
             payload[:source_id]  = task.source_id.to_s
             payload[:source_uid] = task.source_uid.to_s
+            payload[:sent_at]    = Time.now.utc.iso8601
 
             payload[:params] ||= []
             payload[:params] << {
