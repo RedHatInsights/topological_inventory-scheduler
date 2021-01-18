@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi:8.3-227
 
 RUN dnf -y --disableplugin=subscription-manager module enable ruby:2.5 && \
     dnf -y --disableplugin=subscription-manager --setopt=tsflags=nodocs install \
@@ -29,6 +29,7 @@ RUN echo "gem: --no-document" > ~/.gemrc && \
 COPY . $WORKDIR
 COPY docker-assets/entrypoint /usr/bin
 COPY docker-assets/run_scheduler /usr/bin
+COPY docker-assets/run_db_cleaner /usr/bin
 
 RUN chgrp -R 0 $WORKDIR && \
     chmod -R g=u $WORKDIR
