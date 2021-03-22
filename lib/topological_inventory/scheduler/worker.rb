@@ -1,6 +1,7 @@
 require 'manageiq-messaging'
 require 'topological_inventory/scheduler/logging'
 require 'topological_inventory/scheduler/sources_api_client'
+require 'topological_inventory/scheduler/clowder_config'
 
 module TopologicalInventory
   module Scheduler
@@ -114,7 +115,7 @@ module TopologicalInventory
       def send_payload(payload)
         logger.info("ServiceInstance#refresh - publishing to kafka: Source(id: #{payload[:source_id]})...")
         messaging_client.publish_topic(
-          :service => REFRESH_QUEUE_NAME,
+          :service => TopologicalInventory::Scheduler::ClowderConfig.kafka_topic(REFRESH_QUEUE_NAME),
           :event   => 'ServiceInstance.refresh',
           :payload => payload.to_json
         )
