@@ -7,6 +7,9 @@ objects:
   kind: ClowdApp
   metadata:
     name: topo-scheduler
+    labels:
+      app: topological-inventory
+      clowdapp: topo-scheduler
   spec:
     envName: ${ENV_NAME}
     jobs:
