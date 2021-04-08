@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: topological-inventory-scheduler
+objects:
+- apiVersion: cloud.redhat.com/v1alpha1
+  kind: ClowdApp
+  metadata:
+    name: topo-scheduler
+  spec:
+    envName: ${ENV_NAME}
+    jobs:
+    - name: targeted-refresh
+      schedule: ${SCHEDULE_TARGETED_REFRESH}
+      concurrencyPolicy: Forbid
+      restartPolicy: Never
+      startingDeadlineSeconds: 30
+      podSpec:
+        image: ${IMAGE}:${IMAGE_TAG}
+        env:
+        - name: SOURCES_HOST
+          value: ${SOURCES_HOST}
+        - name: SOURCES_PORT
+          value: ${SOURCES_PORT}
+        - name: SOURCES_SCHEME
+          value: ${SOURCES_SCHEME}
+    - name: db-cleaner
+      schedule: ${SCHEDULE_DB_CLEANER}
+      concurrencyPolicy: Forbid
+      restartPolicy: Never
+      startingDeadlineSeconds: 30
+      podSpec:
+        image: ${IMAGE}:${IMAGE_TAG}
+        command:
+        - /usr/bin/entrypoint
+        args:
+        - /usr/bin/run_db_cleaner
+    database:
+      sharedDbAppName: topo-api
+    dependencies:
+    - topo-api
+    kafkaTopics:
+    - topicName: platform.topological-inventory.collector-ansible-tower # producer
+      partitions: 3
+      replicas: 3
+parameters:
+- description: Cronjob Schedule for Topological Inventory DB Cleaner
+  displayName: Cronjob Schedule for DB Cleaner
+  name: SCHEDULE_DB_CLEANER
+  value: "0 14 * * *"
+- description: Cronjob Schedule for Targeted refresh scheduler
+  displayName: Cronjob Schedule for Targeted refresh scheduler
+  name: SCHEDULE_TARGETED_REFRESH
+  value: "*/1 * * * *"
+- description: Host to use for the Sources service URL.
+  displayName: Sources Service Host
+  name: SOURCES_HOST
+  required: true
+  value: sources-api
+- description: Port to use for the Sources service URL.
+  displayName: Sources Service Port
+  name: SOURCES_PORT
+  value: '8000'
+- description: Scheme to use for the Sources service URL.
+  displayName: Sources Service Scheme
+  name: SOURCES_SCHEME
+  value: http
+
