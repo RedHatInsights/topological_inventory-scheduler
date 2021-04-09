@@ -11,6 +11,8 @@ RUN dnf -y --disableplugin=subscription-manager module enable ruby:2.6 && \
       nmap-ncat \
       # To compile pg gem
       postgresql-devel libxml2-devel \
+      # For the mimemagic gem (+rails)
+      shared-mime-info \
       && \
     dnf --disableplugin=subscription-manager clean all
 
